@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Space Invaders</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            display: block;
+            margin: 0 auto;
+            background: #000033;
+        }
+        #game-stats {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-size: 20px;
+            margin: 10px;
+            color: white;
+        }
+        #instructions {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            margin: 10px;
+            color: #888;
+        }
+        .powerup-info {
+            color: white;
+            margin: 5px;
+        }
+        body {
+            background: black;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-stats">Score: <span id="score">0</span> | Lives: <span id="lives">3</span> | Shield: <span id="shield">0</span>%</div>
+    <div id="instructions">
+        <div>Arrow Keys: Move | Space: Shoot</div>
+        <div class="powerup-info">
+            Power-ups: <span style="color: cyan;">Blue</span> = Double Shot | 
+            <span style="color: magenta;">Purple</span> = Shield
+        </div>
+    </div>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    
+    <!-- Simple beep sounds for better compatibility -->
+    <audio id="shootSound">
+        <source src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAADLyqn/y8mY/83Mi//KyLb/0M6m/9DOqf/KyL//y8rE/8jHwv/Ix7j/zMrH/8zKvP/Pzb//0c+8/9DPwP/My7z/zcq7/9DOv//Qz7z/0M67/83Luv/Ny7n/" type="audio/wav">
+    </audio>
+    <audio id="explosionSound">
+        <source src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUxvdWRFeHBsb3Npb24=" type="audio/wav">
+    </audio>
+    <audio id="alienShootSound">
+        <source src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUFsaWVuU2hvb3Q=" type="audio/wav">
+    </audio>
+    <audio id="alienMoveSound">
+        <source src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUFsaWVuTW92ZQ==" type="audio/wav">
+    </audio>
+    <audio id="powerupSound">
+        <source src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAADLyqn/y8mY/83Mi//KyLb/0M6m/9DOqf/KyL//y8rE/8jHwv/Ix7j/zMrH/8zKvP/Pzb//0c+8/9DPwP/My7z/zcq7/9DOv//Qz7z/0M67/83Luv/Ny7n/" type="audio/wav">
+    </audio>
+    
+    <script>
+        // Create audio context for fallback sound generation
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(frequency, duration, type = 'square') {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.type = type;
+            oscillator.frequency.value = frequency;
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            oscillator.start();
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            oscillator.stop(audioCtx.currentTime + duration);
+        }
+
+        // Override audio elements with fallback sound function
+        document.getElementById('shootSound').play = () => playSound(880, 0.1);
+        document.getElementById('explosionSound').play = () => playSound(110, 0.3, 'sawtooth');
+        document.getElementById('alienShootSound').play = () => playSound(440, 0.1);
+        document.getElementById('alienMoveSound').play = () => playSound(220, 0.1);
+        document.getElementById('powerupSound').play = () => playSound(660, 0.2, 'sine');
+    </script>
+    
+    <script src="game.js"></script>
+</body>
+</html> 
